@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: NewsAggregatorApplication
+
+news:
+  guardian-base-url: https://content.guardianapis.com
+  nyt-base-url: https://api.nytimes.com
+  guardian-api-key: 554a4d25-0af0-4dbc-8487-484709cd629d
+  nyt-api-key: u17GNFllDR8SBkMSqQieRs5l22SVy0bF
+  default-page-size: 10
