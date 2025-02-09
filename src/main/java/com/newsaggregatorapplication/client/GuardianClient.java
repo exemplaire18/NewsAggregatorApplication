@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,17 +22,12 @@ public class GuardianClient implements NewsClient {
     }
 
     @Override
-    public List<ArticleDTO> fetchArticles(String keyword, Integer page, Integer size) {
-        // Apply defaults if pagination params are not provided
-        int pageNumber = (page != null) ? page : 1;
-        int pageSize = (size != null) ? size : config.getDefaultPageSize();
+    public List<ArticleDTO> fetchArticles(String keyword) {
 
         GuardianResponse response = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/search")
                         .queryParam("q", keyword)
-                        .queryParam("page", pageNumber)
-                        .queryParam("page-size", pageSize)
                         .queryParam("api-key", config.getGuardianApiKey())
                         .build())
                 .retrieve()
@@ -50,7 +44,7 @@ public class GuardianClient implements NewsClient {
                         .newsWebsite(source)
                         .headline(result.getWebTitle())
                         .url(result.getWebUrl())
-                        .description(result.getSectionName())
+                        .description(result.getSectionName()+": "+result.getWebTitle())
                         .publishedDate(result.getWebPublicationDate())
                         .build())
                 .collect(Collectors.toList());

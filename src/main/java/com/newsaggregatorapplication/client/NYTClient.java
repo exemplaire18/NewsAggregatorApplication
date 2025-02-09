@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,15 +21,12 @@ public class NYTClient implements NewsClient {
     }
 
     @Override
-    public List<ArticleDTO> fetchArticles(String keyword, Integer page, Integer size) {
-        // NYT API only supports `page` (no size). Default to 10 as per API docs.
-        int pageNumber = (page != null) ? page : 0; // NYT uses 0-based pagination
+    public List<ArticleDTO> fetchArticles(String keyword) {
 
         NYTResponse response = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/svc/search/v2/articlesearch.json")
                         .queryParam("q", keyword)
-                        .queryParam("page", pageNumber)
                         .queryParam("api-key", config.getNytApiKey())
                         .build())
                 .retrieve()
