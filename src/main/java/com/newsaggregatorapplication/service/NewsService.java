@@ -2,7 +2,6 @@ package com.newsaggregatorapplication.service;
 
 import com.newsaggregatorapplication.client.GuardianClient;
 import com.newsaggregatorapplication.client.NYTClient;
-import com.newsaggregatorapplication.client.NewsClient;
 import com.newsaggregatorapplication.config.NewsConfig;
 import com.newsaggregatorapplication.dto.ArticleDTO;
 import com.newsaggregatorapplication.dto.ResponseDTO;

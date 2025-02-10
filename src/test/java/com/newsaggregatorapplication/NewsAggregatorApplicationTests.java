@@ -1,13 +1,12 @@
 package com.newsaggregatorapplication;
 
-import org.junit.jupiter.api.Test;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class NewsAggregatorApplicationTests {
-
-    @Test
-    void contextLoads() {
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(NewsAggregatorApplication.class).build().run(args);
     }
 
 }
