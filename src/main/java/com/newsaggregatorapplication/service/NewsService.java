@@ -5,6 +5,7 @@ import com.newsaggregatorapplication.client.NYTClient;
 import com.newsaggregatorapplication.config.NewsConfig;
 import com.newsaggregatorapplication.dto.ArticleDTO;
 import com.newsaggregatorapplication.dto.ResponseDTO;
+import com.newsaggregatorapplication.exception.ServiceUnavailableException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,21 +21,30 @@ public class NewsService {
     private final NewsConfig config;
     private final GuardianClient guardianClient;
     private final NYTClient nytClient;
-    //private final CacheService cacheService;
+    private final CacheService cacheService;
 
-    public ResponseDTO search(String keyword, Integer page) {
+    public ResponseDTO search(String keyword, Integer page) throws ServiceUnavailableException {
         long startTime = System.currentTimeMillis();
-
-        // Fetch articles from clients
-        List<ArticleDTO> guardianArticles = guardianClient.fetchArticles(keyword);
-        List<ArticleDTO> nytArticles = nytClient.fetchArticles(keyword);
-
-        // Aggregate, deduplicate
-        List<ArticleDTO> allArticles = Stream.concat(guardianArticles.stream(), nytArticles.stream())
-                .collect(Collectors.toMap(ArticleDTO::getUrl, Function.identity(), (a1, a2) -> a1))
-                .values().stream()
-                .sorted(Comparator.comparing(ArticleDTO::getPublishedDate).reversed())
-                .collect(Collectors.toList());
+        List<ArticleDTO> allArticles;
+        if (config.isOfflineMode()) {
+            allArticles = cacheService.getFromCache(keyword);
+        } else {
+            try {
+                List<ArticleDTO> guardianArticles = guardianClient.fetchArticles(keyword);
+                List<ArticleDTO> nytArticles = nytClient.fetchArticles(keyword);
+                allArticles = Stream.concat(guardianArticles.stream(), nytArticles.stream())
+                        .collect(Collectors.toMap(ArticleDTO::getUrl, Function.identity(), (a1, a2) -> a1))
+                        .values().stream()
+                        .sorted(Comparator.comparing(ArticleDTO::getPublishedDate).reversed())
+                        .collect(Collectors.toList());
+                cacheService.saveToCache(keyword, allArticles);
+            } catch (Exception ex) {
+                allArticles = cacheService.getFromCache(keyword);
+                if (allArticles.isEmpty()) {
+                    throw new ServiceUnavailableException("APIs unavailable, and no cached data found.");
+                }
+            }
+        }
 
         long endTime = System.currentTimeMillis();
 
@@ -58,10 +68,10 @@ public class NewsService {
                 .build();
     }
 
-    private List<ArticleDTO> paginate(List<ArticleDTO> articles, int page, int size) {
+    private List<ArticleDTO> paginate(List<ArticleDTO> allArticles, int page, int size) {
         int start = (page - 1) * size;
-        int end = Math.min(start + size, articles.size());
-        return articles.subList(start, end);
+        int end = Math.min(start + size, allArticles.size());
+        return allArticles.subList(start, end);
     }
 
     private void addHateoasLinks(ResponseDTO response, String keyword, int page) {
