@@ -1,15 +1,50 @@
 # News Aggregator Application
 
-A News Search Micro Service, to find relevant news for a particular keyword input from the end user (ex: “apple”) with support for pagination. Apply defaults for the pagination in case the optional inputs are empty or not provided.
-Use the APIs from Guardian and New York Times and aggregate the results (eliminating any duplicates) in the output.
-1. End user should be able to view results by changing the input parameters
-2. The service should be ready to be released to production or live environment
-3. The service should be accessible via web browser or postman (using any one of JavaScript frameworks, HTML or JSON)
-4. The solution should support offline mode with toggles
-5. The service should return relevant results as expected, even while the underlying dependencies (Ex: Public API) are not available!
-(Use your own code/logic/data structures and without 3rd party libraries or DB)
+A full-stack application that aggregates news articles from The Guardian and New York Times APIs, providing a seamless search experience with deduplication, pagination, and offline mode support.
 
-API Data Sources
-APIs
-1. Guardian UK - <a href="https://open-platform.theguardian.com/" target="_blank">https://open-platform.theguardian.com/</a> . Register for a free developer API key. Use the Content Search API.
-2. New York Times US - <a href="https://developer.nytimes.com/" target="_blank">https://developer.nytimes.com/</a> . Register for a free developer API key. Use the Article Search API.
+### **Features**
+* Search News: Fetch articles by keyword with pagination.
+* Deduplication: Remove duplicate articles from multiple sources.
+* Offline Mode: Serve cached results when APIs are unavailable.
+* HATEOAS: RESTful navigation with nextPage and prevPage links.
+* Swagger Documentation: Interactive API documentation.
+----------------------------------------------------------------------------------
+### **Tech Stack**
+* Backend: Java, Spring Boot, WebClient, Lombok
+* Frontend: React, Axios, Tailwind CSS
+* CI/CD: Jenkins, Docker, Docker Compose
+* Testing: JUnit 5, Mockito, WireMock
+* Documentation: Swagger/OpenAPI
+-----------------------------------------------------------------------------------
+### **Design and Implementation Approach**
+
+#### 1. **Architecture**
+The application follows a layered architecture:
+
+* Controller Layer: Handles HTTP requests and responses.
+* Service Layer: Implements business logic (e.g., deduplication, pagination).
+* Client Layer: Fetches data from external APIs (Guardian, NYT).
+* Cache Layer: Stores results for offline mode.
+
+2. #### **Sequence Diagram**
+![img.png](img.png)
+-----------------------------------------------------------------------------------------
+### **Design Patterns**
+
+#### 1. Strategy Pattern
+
+* Purpose: Encapsulate interchangeable algorithms for fetching news from different APIs.
+* Implementation: NewsClient interface with GuardianClient and NYTClient implementations.
+
+#### 2. Builder Pattern
+* Purpose: Simplify the creation of complex objects (e.g.: ResponseDTO).
+* Implementation: Lombok’s @Builder annotation.
+
+#### 3. Singleton Pattern
+* Purpose: Ensure a single instance of the cache service.
+* Implementation: Spring’s @Service annotation.
+
+#### 4. Facade Pattern
+* Purpose: Provide a simplified interface to the complex logic of fetching and aggregating news.
+* Implementation: NewsService acts as a facade for the controller.
+----------------------------------------------------------------------------------------------------------------
