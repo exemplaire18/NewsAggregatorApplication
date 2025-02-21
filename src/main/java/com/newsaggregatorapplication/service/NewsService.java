@@ -6,7 +6,6 @@ import com.newsaggregatorapplication.config.NewsConfig;
 import com.newsaggregatorapplication.dto.ArticleDTO;
 import com.newsaggregatorapplication.dto.ResponseDTO;
 import com.newsaggregatorapplication.exception.ServiceUnavailableException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -16,17 +15,23 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-@RequiredArgsConstructor
 public class NewsService {
-    private final NewsConfig config;
+    private final NewsConfig newsConfig;
     private final GuardianClient guardianClient;
     private final NYTClient nytClient;
     private final CacheService cacheService;
 
+    public NewsService(NewsConfig newsConfig, GuardianClient guardianClient, NYTClient nytClient, CacheService cacheService) {
+        this.newsConfig = newsConfig;
+        this.guardianClient = guardianClient;
+        this.nytClient = nytClient;
+        this.cacheService = cacheService;
+    }
+
     public ResponseDTO search(String keyword, Integer page) throws ServiceUnavailableException {
         long startTime = System.currentTimeMillis();
         List<ArticleDTO> allArticles;
-        if (config.isOfflineMode()) {
+        if (newsConfig.isOfflineMode()) {
             allArticles = cacheService.getFromCache(keyword);
         } else {
             try {
@@ -48,8 +53,7 @@ public class NewsService {
 
         long endTime = System.currentTimeMillis();
 
-        // Paginate results (service-level pagination)
-        int pageSize = config.getDefaultPageSize();
+        int pageSize = newsConfig.getDefaultPageSize();
         int currentPage = (page != null) ? page : 1;
 
         ResponseDTO response = buildResponse(allArticles, keyword, currentPage, pageSize, endTime - startTime);

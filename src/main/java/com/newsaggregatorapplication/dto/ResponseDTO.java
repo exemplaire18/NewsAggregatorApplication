@@ -14,8 +14,8 @@ import java.util.Map;
 public class ResponseDTO {
     @Schema(description = "Search keyword used", example = "apple")
     private String searchKeyword;
-    private String city; // Optional (if supported by future filters)
-    private long timeTakenMs; // Time to process the request
+    private String city;
+    private long timeTakenMs;
 
     @Schema(description = "Current page number", example = "1")
     private int currentPage;
