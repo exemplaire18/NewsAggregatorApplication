@@ -39,8 +39,6 @@ public class GuardianClient implements NewsClient {
         } catch (WebClientResponseException e) {
             throw new ServiceUnavailableException("Guardian API unavailable");
         }
-
-
         assert response != null;
         return mapToCommonDTO(response.getResponse().getResults(), "Guardian");
     }

@@ -7,19 +7,17 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/exemplaire18/NewsAggregatorApplication.git'
+                git branch: 'master', url: 'https://github.com/exemplaire18/NewsAggregatorApplication.git'
             }
         }
         stage('Build Backend') {
             steps {
-                dir('backend') {
-                    sh './mvnw clean package -DskipTests'
-                }
+                sh './mvnw clean package -DskipTests'
             }
         }
         stage('Build Frontend') {
             steps {
-                dir('frontend') {
+                dir('news-aggregator-ui') {
                     sh 'npm install'
                     sh 'npm run build'
                 }

@@ -5,6 +5,7 @@ import com.newsaggregatorapplication.client.NYTClient;
 import com.newsaggregatorapplication.config.NewsConfig;
 import com.newsaggregatorapplication.dto.ArticleDTO;
 import com.newsaggregatorapplication.dto.ResponseDTO;
+import com.newsaggregatorapplication.service.CacheService;
 import com.newsaggregatorapplication.service.NewsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class NewsServiceUnitTest {
-
     @Mock
     private GuardianClient guardianClient;
 
@@ -30,16 +30,19 @@ class NewsServiceUnitTest {
     private NYTClient nytClient;
 
     @Mock
-    private NewsConfig config;
+    private NewsConfig newsConfig;
+
+    @Mock
+    private CacheService cacheService;
 
     @InjectMocks
     private NewsService newsService;
 
     @BeforeEach
     void setup(){
-        when(config.getDefaultPageSize()).thenReturn(10);
+        when(newsConfig.isOfflineMode()).thenReturn(false);
+        when(newsConfig.getDefaultPageSize()).thenReturn(10);
     }
-
 
     @Test
     void testSearch_WithDeduplication() {
